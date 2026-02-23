@@ -8,70 +8,129 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+            background: #ffffff;
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             background: white;
             border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
             overflow: hidden;
         }
-        
+
         .header {
-            background: linear-gradient(135deg, #008000 0%, #008000 100%);
+            background: linear-gradient(135deg, #006400 0%, #008000 100%);
             color: white;
             padding: 30px;
             text-align: center;
         }
-        
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+
+        .content { padding: 30px; }
+
+        /* PROGRESS BAR */
+        .progress-bar-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 32px;
+            flex-wrap: nowrap;
         }
-        
-        .header p {
-            opacity: 0.9;
-            font-size: 14px;
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
         }
-        
-        .content {
-            padding: 30px;
+
+        .step-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #a0aec0;
+            font-weight: 700;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 1;
         }
-        
+
+        .step-circle.active {
+            background: #008000;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(0,128,0,0.2);
+        }
+
+        .step-circle.done {
+            background: #22543d;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 11px;
+            color: #718096;
+            margin-top: 6px;
+            text-align: center;
+            max-width: 80px;
+            line-height: 1.3;
+        }
+
+        .step-label.active { color: #008000; font-weight: 600; }
+        .step-label.done { color: #22543d; }
+
+        .step-connector {
+            height: 3px;
+            width: 60px;
+            background: #e2e8f0;
+            margin-bottom: 22px;
+            transition: background 0.3s;
+        }
+
+        .step-connector.done { background: #008000; }
+
+        /* SECTION */
         .section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f5f5f5;
+            margin-bottom: 28px;
+            padding: 22px;
+            background: #f7f7f7;
             border-radius: 12px;
-            border-left: 3px solid #008000;
+            border-left: 4px solid #008000;
+            animation: fadeIn 0.35s ease;
         }
-        
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .section-title {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 600;
             color: #2d3748;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         .section-icon {
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             background: #008000;
             border-radius: 6px;
             display: flex;
@@ -79,47 +138,44 @@
             justify-content: center;
             color: white;
             font-size: 14px;
+            flex-shrink: 0;
         }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
+
+        .form-group { margin-bottom: 15px; }
+
         .form-label {
             display: block;
             font-size: 14px;
             font-weight: 500;
-            color: #000000;
+            color: #000;
             margin-bottom: 8px;
         }
-        
-        .radio-group {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        
+
+        .radio-group { display: flex; gap: 15px; flex-wrap: wrap; }
+
         .radio-option {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 15px;
+            padding: 10px 18px;
             background: white;
             border: 2px solid #e2e8f0;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 14px;
         }
-        
-        .radio-option:hover {
-            border-color: #008000;
-            background: #f7fafc;
+
+        .radio-option:hover { border-color: #008000; background: #f0fff4; }
+        .radio-option.selected { border-color: #008000; background: #f0fff4; font-weight: 600; }
+        .radio-option input[type="radio"] { cursor: pointer; }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
         }
-        
-        .radio-option input[type="radio"] {
-            cursor: pointer;
-        }
-        
+
         .checkbox-option {
             display: flex;
             align-items: center;
@@ -130,72 +186,135 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 14px;
         }
-        
-        .checkbox-option:hover {
-            border-color: #008000;
-            background: #f7fafc;
-        }
-        
-        .checkbox-option input[type="checkbox"] {
-            cursor: pointer;
-            width: 18px;
-            height: 18px;
-        }
-        
+
+        .checkbox-option:hover { border-color: #008000; background: #f0fff4; }
+
         .checkbox-option.checked {
             background: #eff6ef;
             border-color: #008000;
         }
-        
-        .results {
-            margin-top: 30px;
+
+        .checkbox-option input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
         }
-        
+
+        /* NAV BUTTONS */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-next {
+            background: #008000;
+            color: white;
+            margin-left: auto;
+        }
+
+        .btn-next:hover { background: #006400; }
+        .btn-next:disabled { background: #a0aec0; cursor: not-allowed; }
+
+        .btn-back {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-back:hover { background: #cbd5e0; }
+
+        /* RESULTS */
+        .results { margin-top: 10px; }
+
         .result-card {
             background: white;
             border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
+            padding: 22px;
+            margin-bottom: 18px;
             border: 2px solid #e2e8f0;
         }
-        
+
         .result-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: #2d3748;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
-        
+
         .result-badge {
             display: inline-block;
-            padding: 6px 12px;
+            padding: 7px 14px;
             background: #008000;
             color: white;
             border-radius: 6px;
             font-size: 14px;
             font-weight: 600;
         }
-        
+
         .result-content {
             color: #4a5568;
-            line-height: 1.8;
+            line-height: 1.9;
             font-size: 14px;
             white-space: pre-line;
         }
-        
-        .result-content ul {
-            margin-left: 20px;
-            margin-top: 10px;
+
+        .result-content ul { margin-left: 20px; margin-top: 10px; }
+        .result-content li { margin-bottom: 8px; }
+
+        /* CLASSIFICATION IMAGE */
+        .classif-image-wrap {
+            margin-top: 18px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #c6f6d5;
+            background: #f0fff4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        
-        .result-content li {
-            margin-bottom: 8px;
+
+        .classif-image-wrap img {
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            display: block;
         }
-        
+
+        .classif-image-caption {
+            font-size: 12px;
+            color: #276749;
+            padding: 8px 14px;
+            text-align: center;
+        }
+
+        /* missing image fallback */
+        .classif-image-placeholder {
+            width: 100%;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #68d391;
+            font-size: 48px;
+        }
+
         .alert {
             padding: 15px;
             background: #fff5f5;
@@ -205,7 +324,7 @@
             font-size: 14px;
             margin-bottom: 20px;
         }
-        
+
         .success {
             padding: 15px;
             background: #f0fff4;
@@ -214,25 +333,12 @@
             color: #22543d;
             font-size: 14px;
         }
-        
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-        
+
         @media (max-width: 768px) {
-            .container {
-                border-radius: 0;
-            }
-            
-            .content {
-                padding: 20px;
-            }
-            
-            .radio-group {
-                flex-direction: column;
-            }
+            .container { border-radius: 0; }
+            .content { padding: 16px; }
+            .radio-group { flex-direction: column; }
+            .step-connector { width: 30px; }
         }
     </style>
 </head>
@@ -242,16 +348,106 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
+        // ── Mapeamento de classificação → arquivo de imagem e emoji fallback ──
+        const CLASSIF_IMAGES = {
+            'Atendimento como Imóvel Urbano':           { src: 'img_urbano.jpg',        emoji: '🏙️', label: 'Imóvel Urbano' },
+            'Necessária Regularização Fundiária (REURB)':{ src: 'img_reurb.jpg',         emoji: '📋', label: 'Regularização Fundiária – REURB' },
+            'Parcelamento de Solo':                     { src: 'img_parcelamento.jpg',   emoji: '🗺️', label: 'Parcelamento de Solo' },
+            'Atendimento como Imóvel Rural':            { src: 'img_rural.jpg',          emoji: '🌿', label: 'Imóvel Rural' },
+            'Imóvel rural abaixo da FMP':               { src: 'img_fmp.jpg',            emoji: '📐', label: 'Abaixo da Fração Mínima de Parcelamento' },
+            'Pedido envolvendo Área Indígena':          { src: 'img_indigena.jpg',       emoji: '🪶', label: 'Área Indígena' },
+            'Pedido envolvendo Área Quilombola':        { src: 'img_quilombola.jpg',     emoji: '🏘️', label: 'Área Quilombola' },
+        };
+
+        const STEPS = [
+            { id: 1, label: 'Zona' },
+            { id: 2, label: 'Características\ndo Local' },
+            { id: 3, label: 'Rede e\nCargas' },
+            { id: 4, label: 'Documentação' },
+            { id: 5, label: 'Resultado' },
+        ];
+
+        function CheckboxField({ label, checked, onChange }) {
+            return (
+                <div
+                    className={`checkbox-option ${checked ? 'checked' : ''}`}
+                    onClick={() => onChange(!checked)}
+                >
+                    <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) => onChange(e.target.checked)}
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                    <span>{label}</span>
+                </div>
+            );
+        }
+
+        function ClassifImage({ classificacao }) {
+            const [imgError, setImgError] = useState(false);
+            const info = CLASSIF_IMAGES[classificacao];
+            if (!info) return null;
+
+            return (
+                <div className="classif-image-wrap">
+                    {!imgError ? (
+                        <img
+                            src={info.src}
+                            alt={info.label}
+                            onError={() => setImgError(true)}
+                        />
+                    ) : (
+                        <div className="classif-image-placeholder">{info.emoji}</div>
+                    )}
+                    <div className="classif-image-caption">{info.label}</div>
+                </div>
+            );
+        }
+
+        function ProgressBar({ currentStep, onStepClick }) {
+            return (
+                <div className="progress-bar-wrapper">
+                    {STEPS.map((s, i) => {
+                        const done = currentStep > s.id;
+                        const active = currentStep === s.id;
+                        const clickable = s.id < currentStep;
+                        return (
+                            <React.Fragment key={s.id}>
+                                <div
+                                    className="step-item"
+                                    style={{ cursor: clickable ? 'pointer' : 'default' }}
+                                    onClick={() => clickable && onStepClick(s.id)}
+                                    title={clickable ? `Voltar para: ${s.label}` : undefined}
+                                >
+                                    <div className={`step-circle ${done ? 'done' : active ? 'active' : ''}`} style={clickable ? { boxShadow: '0 0 0 3px rgba(0,128,0,0.15)' } : {}}>
+                                        {done ? '✓' : s.id}
+                                    </div>
+                                    <div className={`step-label ${done ? 'done' : active ? 'active' : ''}`}
+                                        style={clickable ? { textDecoration: 'underline dotted', textUnderlineOffset: '3px' } : {}}
+                                    >
+                                        {s.label}
+                                    </div>
+                                </div>
+                                {i < STEPS.length - 1 && (
+                                    <div className={`step-connector ${currentStep > s.id ? 'done' : ''}`} />
+                                )}
+                            </React.Fragment>
+                        );
+                    })}
+                </div>
+            );
+        }
+
         function ClassificadorAtendimento() {
+            const [step, setStep] = useState(1);
+
             const [dados, setDados] = useState({
-                // Local do Atendimento
                 zona: '',
                 infraConsolidada: false,
                 areaInferior2ha: false,
                 indiciosUrbanizacao: false,
                 expansaoNaturalMunic: false,
-                
-                // Rede Local e Cargas
                 redeAPorta: false,
                 ramalSubt: false,
                 cargaMenor50: false,
@@ -262,33 +458,29 @@
                 tensaoBaixa: false,
                 atendIndividual: false,
                 semAlterExclusiva: false,
-                
-                // Documentação
                 registroApresentado: false,
                 indigena: false,
                 quilombola: false,
                 regularidadeUrbana: false,
                 heranca: false,
-                ccirIndividualizado: false
+                ccirIndividualizado: false,
             });
 
             const [resultados, setResultados] = useState({
                 classificacao: '',
                 orientacoes: '',
                 universalizacao: '',
-                categorias: []
+                categorias: [],
             });
 
             const handleChange = (campo, valor) => {
-                setDados(prev => ({
-                    ...prev,
-                    [campo]: valor
-                }));
+                setDados(prev => ({ ...prev, [campo]: valor }));
             };
 
+            // Recalcula sempre que os dados mudam
             useEffect(() => {
-                calcularClassificacao();
-            }, [dados]);
+                if (step === 5) calcularClassificacao();
+            }, [dados, step]);
 
             const calcularClassificacao = () => {
                 const categorias = [];
@@ -296,162 +488,98 @@
                 let hasRural = false;
                 let hasUrban = false;
 
-                // NÃO RURAL → URBANO
                 if (dados.zona !== 'Rural') {
                     categorias.push('Atendimento como Imóvel Urbano');
                     hasUrban = true;
-                    
-                    orientacoes += `• Enquadramento urbano:\n`;
-                    orientacoes += `O pedido não se caracteriza como rural e será tratado como imóvel urbano.\n`;
-                    orientacoes += `Documentação esperada:\n`;
-                    orientacoes += `- Documento de posse ou propriedade;\n`;
-                    orientacoes += `- Comprovação de regularidade urbana (IPTU).\n\n`;
-                    orientacoes += `• Regularização Fundiária (REURB):\n`;
-                    orientacoes += `O atendimento poderá ser enquadrado em REURB, com custos atribuídos aos beneficiários.\n\n`;
-                    
+                    orientacoes += `• Enquadramento urbano:\nO pedido não se caracteriza como rural e será tratado como imóvel urbano.\nDocumentação esperada:\n- Documento de posse ou propriedade;\n- Comprovação de regularidade urbana (IPTU).\n\n`;
+                    orientacoes += `• Regularização Fundiária (REURB):\nO atendimento poderá ser enquadrado em REURB, com custos atribuídos aos beneficiários.\n\n`;
                 } else {
-                    // RURAL
                     if (dados.heranca) {
                         categorias.push('Pedido envolvendo Herança');
                         hasRural = true;
-                        orientacoes += `• Pedido envolvendo Herança:\n`;
-                        orientacoes += `Este pedido envolve processo de herança e requer documentação específica.\n\n`;
-                        
+                        orientacoes += `• Pedido envolvendo Herança:\nEste pedido envolve processo de herança e requer documentação específica.\n\n`;
                     } else if (dados.indigena) {
                         categorias.push('Pedido envolvendo Área Indígena');
                         hasRural = true;
-                        orientacoes += `• Pedido envolvendo Área Indígena:\n`;
-                        orientacoes += `Atendimento em área indígena requer procedimentos específicos e autorização da FUNAI.\n\n`;
-                        
+                        orientacoes += `• Pedido envolvendo Área Indígena:\nAtendimento em área indígena requer procedimentos específicos e autorização da FUNAI.\n\n`;
                     } else if (dados.quilombola) {
                         categorias.push('Pedido envolvendo Área Quilombola');
                         hasRural = true;
-                        orientacoes += `• Pedido envolvendo Área Quilombola:\n`;
-                        orientacoes += `Atendimento em área quilombola requer procedimentos específicos e documentação da comunidade.\n\n`;
-                        
+                        orientacoes += `• Pedido envolvendo Área Quilombola:\nAtendimento em área quilombola requer procedimentos específicos e documentação da comunidade.\n\n`;
                     } else if (dados.indiciosUrbanizacao) {
-                        // Com infraestrutura consolidada → REURB
                         if (dados.infraConsolidada && dados.expansaoNaturalMunic) {
                             categorias.push('Necessária Regularização Fundiária (REURB)');
                             hasUrban = true;
-                            
-                            orientacoes += `• Área rural com indícios de urbanização e infraestrutura consolidada:\n`;
-                            orientacoes += `O atendimento requer Regularização Fundiária Urbana (REURB).\n`;
-                            orientacoes += `REURB-E: custeada pelos beneficiários;\n`;
-                            orientacoes += `REURB-S: custeada pelo município, conforme Lei nº 13.465/2017 e REN 1000/2021.\n\n`;
-                            
+                            orientacoes += `• Área rural com indícios de urbanização e infraestrutura consolidada:\nO atendimento requer Regularização Fundiária Urbana (REURB).\nREURB-E: custeada pelos beneficiários;\nREURB-S: custeada pelo município, conforme Lei nº 13.465/2017 e REN 1000/2021.\n\n`;
                         } else {
                             categorias.push('Parcelamento de Solo');
                             hasRural = true;
-                            
-                            orientacoes += `• Área rural com indícios de urbanização sem infraestrutura consolidada:\n`;
-                            orientacoes += `Caracteriza parcelamento de solo.\n`;
-                            orientacoes += `A implantação ou custeio da infraestrutura básica das redes internas de energia elétrica é de responsabilidade do interessado, conforme REN 1000/2021 (arts. 480 a 484).\n\n`;
+                            orientacoes += `• Área rural com indícios de urbanização sem infraestrutura consolidada:\nCaracteriza parcelamento de solo.\nA implantação ou custeio da infraestrutura básica das redes internas de energia elétrica é de responsabilidade do interessado, conforme REN 1000/2021 (arts. 480 a 484).\n\n`;
                         }
-                        
                     } else {
-                        // Sem indícios de urbanização
                         if (dados.areaInferior2ha && (dados.registroApresentado || dados.ccirIndividualizado)) {
                             categorias.push('Atendimento como Imóvel Rural');
                             hasRural = true;
-                            
-                            orientacoes += `• Área rural sem indícios de urbanização:\n`;
-                            orientacoes += `O atendimento pode ser enquadrado como imóvel rural, mediante apresentação da documentação rural aplicável.\n\n`;
-                            
+                            orientacoes += `• Área rural sem indícios de urbanização:\nO atendimento pode ser enquadrado como imóvel rural, mediante apresentação da documentação rural aplicável.\n\n`;
                         } else {
                             categorias.push('Imóvel rural abaixo da FMP');
                             hasRural = true;
-                            
-                            orientacoes += `• Área rural inferior à Fração Mínima de Parcelamento (FMP):\n`;
-                            orientacoes += `É necessária a apresentação de Certificado de Cadastro de Imóvel Rural (CCIR) individualizado, referente à área solicitada.\n\n`;
+                            orientacoes += `• Área rural inferior à Fração Mínima de Parcelamento (FMP):\nÉ necessária a apresentação de Certificado de Cadastro de Imóvel Rural (CCIR) individualizado, referente à área solicitada.\n\n`;
                         }
                     }
                 }
 
-                // CARGA > 75 kW (transversal)
                 if (dados.cargaAcima75) {
                     categorias.push('Carga instalada superior a 75 kW');
-                    
-                    orientacoes += `• Carga instalada acima de 75 kW:\n`;
-                    orientacoes += `Solicitações com esse porte exigem análise técnica específica.\n`;
-                    orientacoes += `Documentação técnica necessária:\n`;
-                    orientacoes += `- Cadastro da solicitação no APRWEB por Responsável Técnico;\n`;
-                    orientacoes += `- Formulário de orçamento de conexão/alteração de carga;\n`;
-                    orientacoes += `- Planta de situação/locação;\n`;
-                    orientacoes += `- ART devidamente registrada.\n\n`;
+                    orientacoes += `• Carga instalada acima de 75 kW:\nSolicitações com esse porte exigem análise técnica específica.\nDocumentação técnica necessária:\n- Cadastro da solicitação no APRWEB por Responsável Técnico;\n- Formulário de orçamento de conexão/alteração de carga;\n- Planta de situação/locação;\n- ART devidamente registrada.\n\n`;
                 }
 
-                // Documentação base
                 let docBase = '';
                 if (hasRural) {
-                    docBase = `Documentação normalmente requerida para atendimento em área rural:\n`;
-                    docBase += `- Documento de posse ou propriedade do imóvel (escritura, contrato de compra e venda, arrendamento ou equivalente);\n`;
-                    docBase += `- Certificado de Cadastro de Imóvel Rural (CCIR) da área solicitada.\n\n`;
+                    docBase = `Documentação normalmente requerida para atendimento em área rural:\n- Documento de posse ou propriedade do imóvel (escritura, contrato de compra e venda, arrendamento ou equivalente);\n- Certificado de Cadastro de Imóvel Rural (CCIR) da área solicitada.\n\n`;
                 }
                 if (hasUrban) {
-                    docBase += `Documentação normalmente requerida para atendimento em área urbana:\n`;
-                    docBase += `- Documento de posse ou propriedade do imóvel;\n`;
-                    docBase += `- Documento municipal que comprove regularidade da edificação (IPTU, alvará, Habite-se, certidão de número ou equivalente).\n\n`;
+                    docBase += `Documentação normalmente requerida para atendimento em área urbana:\n- Documento de posse ou propriedade do imóvel;\n- Documento municipal que comprove regularidade da edificação (IPTU, alvará, Habite-se, certidão de número ou equivalente).\n\n`;
                 }
-
                 orientacoes = docBase + orientacoes;
 
-                // Universalização (somente urbano)
                 let universalizacao = '';
                 if (dados.zona !== 'Rural') {
-                    const isUniversalizavel = 
-                        dados.tensaoBaixa &&
-                        dados.atendIndividual &&
-                        dados.cargaMenor50 &&
-                        dados.primeiroAtend &&
-                        dados.semAlterExclusiva &&
-                        !dados.necessarioExtensao &&
-                        !dados.necessarioConversao;
+                    const isUniversalizavel =
+                        dados.tensaoBaixa && dados.atendIndividual && dados.cargaMenor50 &&
+                        dados.primeiroAtend && dados.semAlterExclusiva &&
+                        !dados.necessarioExtensao && !dados.necessarioConversao;
 
-                    if (isUniversalizavel) {
-                        universalizacao = `A solicitação atende integralmente aos critérios de universalização de obra em área urbana, considerando:\n`;
-                        universalizacao += `• Atendimento em baixa tensão;\n`;
-                        universalizacao += `• Atendimento individual;\n`;
-                        universalizacao += `• Carga instalada inferior a 50 kW;\n`;
-                        universalizacao += `• Primeiro atendimento do imóvel;\n`;
-                        universalizacao += `• Ausência de necessidade de alteração exclusiva para o solicitante;\n`;
-                        universalizacao += `• Ausência de necessidade de extensão ou conversão de rede;\n`;
-                        universalizacao += `• Ausência de necessidade de ramal subterrâneo.`;
-                    } else {
-                        universalizacao = `A solicitação não atende integralmente aos critérios de universalização de obra em área urbana. O enquadramento depende da avaliação individual dos requisitos técnicos informados no checklist.`;
-                    }
+                    universalizacao = isUniversalizavel
+                        ? `A solicitação atende integralmente aos critérios de universalização de obra em área urbana, considerando:\n• Atendimento em baixa tensão;\n• Atendimento individual;\n• Carga instalada inferior a 50 kW;\n• Primeiro atendimento do imóvel;\n• Ausência de necessidade de alteração exclusiva para o solicitante;\n• Ausência de necessidade de extensão ou conversão de rede;\n• Ausência de necessidade de ramal subterrâneo.`
+                        : `A solicitação não atende integralmente aos critérios de universalização de obra em área urbana. O enquadramento depende da avaliação individual dos requisitos técnicos informados no checklist.`;
                 } else {
                     universalizacao = `Critérios de universalização de obra aplicáveis exclusivamente a atendimentos em área urbana.`;
                 }
 
-                // Classificação principal
-                let classificacaoPrincipal = '';
-                if (categorias.length > 0) {
-                    classificacaoPrincipal = categorias[0];
-                }
-
                 setResultados({
-                    classificacao: classificacaoPrincipal,
-                    orientacoes: orientacoes,
-                    universalizacao: universalizacao,
-                    categorias: categorias
+                    classificacao: categorias[0] || '',
+                    orientacoes,
+                    universalizacao,
+                    categorias,
                 });
             };
 
-            const CheckboxField = ({ label, checked, onChange }) => (
-                <div 
-                    className={`checkbox-option ${checked ? 'checked' : ''}`}
-                    onClick={() => onChange(!checked)}
-                >
-                    <input 
-                        type="checkbox" 
-                        checked={checked}
-                        onChange={(e) => onChange(e.target.checked)}
-                        onClick={(e) => e.stopPropagation()}
-                    />
-                    <span>{label}</span>
-                </div>
-            );
+            const goNext = () => {
+                if (step === 4) calcularClassificacao();
+                setStep(s => Math.min(s + 1, 5));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+
+            const goBack = () => {
+                setStep(s => Math.max(s - 1, 1));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+
+            const canNext = () => {
+                if (step === 1) return dados.zona !== '';
+                return true;
+            };
 
             return (
                 <div className="container">
@@ -461,199 +589,165 @@
                     </div>
 
                     <div className="content">
-                        {/* LOCAL DO ATENDIMENTO */}
-                        <div className="section">
-                            <div className="section-title">
-                                <div className="section-icon">📌</div>
-                                Local do Atendimento
+                        <ProgressBar currentStep={step} onStepClick={(s) => { setStep(s); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+
+                        {/* ETAPA 1 — ZONA */}
+                        {step === 1 && (
+                            <div className="section">
+                                <div className="section-title">
+                                    <div className="section-icon">📌</div>
+                                    Zona de Localização do Imóvel
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Selecione a zona onde o imóvel está localizado:</label>
+                                    <div className="radio-group">
+                                        {['Rural', 'Urbano'].map(z => (
+                                            <label key={z} className={`radio-option ${dados.zona === z ? 'selected' : ''}`}>
+                                                <input
+                                                    type="radio"
+                                                    name="zona"
+                                                    value={z}
+                                                    checked={dados.zona === z}
+                                                    onChange={(e) => handleChange('zona', e.target.value)}
+                                                />
+                                                <span>{z === 'Rural' ? '🌿 Rural' : '🏙️ Urbano'}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                                {!dados.zona && (
+                                    <div className="alert">⚠️ Selecione a zona para continuar.</div>
+                                )}
                             </div>
-                            
-                            <div className="form-group">
-                                <label className="form-label">Zona de Localização</label>
-                                <div className="radio-group">
-                                    <label className="radio-option">
-                                        <input 
-                                            type="radio" 
-                                            name="zona"
-                                            value="Rural"
-                                            checked={dados.zona === 'Rural'}
-                                            onChange={(e) => handleChange('zona', e.target.value)}
-                                        />
-                                        <span>Rural</span>
-                                    </label>
-                                    <label className="radio-option">
-                                        <input 
-                                            type="radio" 
-                                            name="zona"
-                                            value="Urbano"
-                                            checked={dados.zona === 'Urbano'}
-                                            onChange={(e) => handleChange('zona', e.target.value)}
-                                        />
-                                        <span>Urbano</span>
-                                    </label>
+                        )}
+
+                        {/* ETAPA 2 — CARACTERÍSTICAS DO LOCAL */}
+                        {step === 2 && (
+                            <div className="section">
+                                <div className="section-title">
+                                    <div className="section-icon">🏡</div>
+                                    Características do Local ({dados.zona})
+                                </div>
+                                <div className="grid-2">
+                                    <CheckboxField label="Possui infraestrutura consolidada" checked={dados.infraConsolidada} onChange={v => handleChange('infraConsolidada', v)} />
+                                    <CheckboxField label="Área do terreno/imóvel inferior a 2 ha" checked={dados.areaInferior2ha} onChange={v => handleChange('areaInferior2ha', v)} />
+                                    <CheckboxField label="Há indícios de urbanização" checked={dados.indiciosUrbanizacao} onChange={v => handleChange('indiciosUrbanizacao', v)} />
+                                    <CheckboxField label="Área de expansão natural do município" checked={dados.expansaoNaturalMunic} onChange={v => handleChange('expansaoNaturalMunic', v)} />
                                 </div>
                             </div>
+                        )}
 
-                            <div className="grid-2">
-                                <CheckboxField 
-                                    label="Possui infraestrutura consolidada"
-                                    checked={dados.infraConsolidada}
-                                    onChange={(v) => handleChange('infraConsolidada', v)}
-                                />
-                                <CheckboxField 
-                                    label="Área do terreno/imóvel inferior a 2 ha"
-                                    checked={dados.areaInferior2ha}
-                                    onChange={(v) => handleChange('areaInferior2ha', v)}
-                                />
-                                <CheckboxField 
-                                    label="Há indícios de urbanização"
-                                    checked={dados.indiciosUrbanizacao}
-                                    onChange={(v) => handleChange('indiciosUrbanizacao', v)}
-                                />
-                                <CheckboxField 
-                                    label="Área de expansão natural do município"
-                                    checked={dados.expansaoNaturalMunic}
-                                    onChange={(v) => handleChange('expansaoNaturalMunic', v)}
-                                />
+                        {/* ETAPA 3 — REDE LOCAL E CARGAS */}
+                        {step === 3 && (
+                            <div className="section">
+                                <div className="section-title">
+                                    <div className="section-icon">⚡</div>
+                                    Rede Local e Cargas
+                                </div>
+                                <div className="grid-2">
+                                    <CheckboxField label="Possui rede de baixa tensão à porta" checked={dados.redeAPorta} onChange={v => handleChange('redeAPorta', v)} />
+                                    <CheckboxField label="Ramal subterrâneo" checked={dados.ramalSubt} onChange={v => handleChange('ramalSubt', v)} />
+                                    <CheckboxField label="Carga instalada inferior a 50 kW" checked={dados.cargaMenor50} onChange={v => handleChange('cargaMenor50', v)} />
+                                    <CheckboxField label="Carga instalada acima de 75 kW" checked={dados.cargaAcima75} onChange={v => handleChange('cargaAcima75', v)} />
+                                    <CheckboxField label="Primeiro atendimento" checked={dados.primeiroAtend} onChange={v => handleChange('primeiroAtend', v)} />
+                                    <CheckboxField label="Necessário extensão de rede" checked={dados.necessarioExtensao} onChange={v => handleChange('necessarioExtensao', v)} />
+                                    <CheckboxField label="Necessário conversão de rede" checked={dados.necessarioConversao} onChange={v => handleChange('necessarioConversao', v)} />
+                                    <CheckboxField label="Atendimento em baixa tensão" checked={dados.tensaoBaixa} onChange={v => handleChange('tensaoBaixa', v)} />
+                                    <CheckboxField label="Atendimento individual" checked={dados.atendIndividual} onChange={v => handleChange('atendIndividual', v)} />
+                                    <CheckboxField label="Sem alteração na rede por motivo exclusivo" checked={dados.semAlterExclusiva} onChange={v => handleChange('semAlterExclusiva', v)} />
+                                </div>
                             </div>
-                        </div>
+                        )}
 
-                        {/* REDE LOCAL E CARGAS */}
-                        <div className="section">
-                            <div className="section-title">
-                                <div className="section-icon">⚡</div>
-                                Rede Local e Cargas
+                        {/* ETAPA 4 — DOCUMENTAÇÃO */}
+                        {step === 4 && (
+                            <div className="section">
+                                <div className="section-title">
+                                    <div className="section-icon">📄</div>
+                                    Documentação
+                                </div>
+                                <div className="grid-2">
+                                    <CheckboxField label="Registro apresentado" checked={dados.registroApresentado} onChange={v => handleChange('registroApresentado', v)} />
+                                    <CheckboxField label="Localizado em área indígena" checked={dados.indigena} onChange={v => handleChange('indigena', v)} />
+                                    <CheckboxField label="Localizado em área quilombola" checked={dados.quilombola} onChange={v => handleChange('quilombola', v)} />
+                                    <CheckboxField label="Regularidade urbana apresentada" checked={dados.regularidadeUrbana} onChange={v => handleChange('regularidadeUrbana', v)} />
+                                    <CheckboxField label="Inventário ou herança" checked={dados.heranca} onChange={v => handleChange('heranca', v)} />
+                                    <CheckboxField label="CCIR individualizado" checked={dados.ccirIndividualizado} onChange={v => handleChange('ccirIndividualizado', v)} />
+                                </div>
                             </div>
-                            
-                            <div className="grid-2">
-                                <CheckboxField 
-                                    label="Possui rede de baixa tensão à porta"
-                                    checked={dados.redeAPorta}
-                                    onChange={(v) => handleChange('redeAPorta', v)}
-                                />
-                                <CheckboxField 
-                                    label="Ramal subterrâneo"
-                                    checked={dados.ramalSubt}
-                                    onChange={(v) => handleChange('ramalSubt', v)}
-                                />
-                                <CheckboxField 
-                                    label="Carga instalada inferior a 50 kW"
-                                    checked={dados.cargaMenor50}
-                                    onChange={(v) => handleChange('cargaMenor50', v)}
-                                />
-                                <CheckboxField 
-                                    label="Carga instalada acima de 75 kW"
-                                    checked={dados.cargaAcima75}
-                                    onChange={(v) => handleChange('cargaAcima75', v)}
-                                />
-                                <CheckboxField 
-                                    label="Primeiro atendimento"
-                                    checked={dados.primeiroAtend}
-                                    onChange={(v) => handleChange('primeiroAtend', v)}
-                                />
-                                <CheckboxField 
-                                    label="Necessário extensão de rede"
-                                    checked={dados.necessarioExtensao}
-                                    onChange={(v) => handleChange('necessarioExtensao', v)}
-                                />
-                                <CheckboxField 
-                                    label="Necessário conversão de rede"
-                                    checked={dados.necessarioConversao}
-                                    onChange={(v) => handleChange('necessarioConversao', v)}
-                                />
-                                <CheckboxField 
-                                    label="Atendimento em baixa tensão"
-                                    checked={dados.tensaoBaixa}
-                                    onChange={(v) => handleChange('tensaoBaixa', v)}
-                                />
-                                <CheckboxField 
-                                    label="Atendimento individual"
-                                    checked={dados.atendIndividual}
-                                    onChange={(v) => handleChange('atendIndividual', v)}
-                                />
-                                <CheckboxField 
-                                    label="Sem alteração na rede por motivo exclusivo"
-                                    checked={dados.semAlterExclusiva}
-                                    onChange={(v) => handleChange('semAlterExclusiva', v)}
-                                />
-                            </div>
-                        </div>
+                        )}
 
-                        {/* DOCUMENTAÇÃO */}
-                        <div className="section">
-                            <div className="section-title">
-                                <div className="section-icon">📄</div>
-                                Documentação
-                            </div>
-                            
-                            <div className="grid-2">
-                                <CheckboxField 
-                                    label="Registro apresentado"
-                                    checked={dados.registroApresentado}
-                                    onChange={(v) => handleChange('registroApresentado', v)}
-                                />
-                                <CheckboxField 
-                                    label="Localizado em área indígena"
-                                    checked={dados.indigena}
-                                    onChange={(v) => handleChange('indigena', v)}
-                                />
-                                <CheckboxField 
-                                    label="Localizado em área quilombola"
-                                    checked={dados.quilombola}
-                                    onChange={(v) => handleChange('quilombola', v)}
-                                />
-                                <CheckboxField 
-                                    label="Regularidade urbana apresentada"
-                                    checked={dados.regularidadeUrbana}
-                                    onChange={(v) => handleChange('regularidadeUrbana', v)}
-                                />
-                                <CheckboxField 
-                                    label="Inventário ou herança"
-                                    checked={dados.heranca}
-                                    onChange={(v) => handleChange('heranca', v)}
-                                />
-                                <CheckboxField 
-                                    label="CCIR individualizado"
-                                    checked={dados.ccirIndividualizado}
-                                    onChange={(v) => handleChange('ccirIndividualizado', v)}
-                                />
-                            </div>
-                        </div>
-
-                        {/* RESULTADOS */}
-                        {resultados.classificacao && (
+                        {/* ETAPA 5 — RESULTADOS */}
+                        {step === 5 && resultados.classificacao && (
                             <div className="results">
+                                {/* Classificação Principal + Imagem */}
                                 <div className="result-card">
-                                    <div className="result-title">
-                                        <span>🏷️ Classificação Principal</span>
-                                    </div>
+                                    <div className="result-title">🏷️ Classificação Principal</div>
                                     <div className="result-badge">{resultados.classificacao}</div>
-                                    
+
                                     {resultados.categorias.length > 1 && (
-                                        <div style={{marginTop: '15px'}}>
+                                        <div style={{marginTop: '14px'}}>
                                             <strong>Todas as classificações aplicáveis:</strong>
-                                            <ul>
+                                            <ul style={{marginLeft:'20px', marginTop:'8px'}}>
                                                 {resultados.categorias.map((cat, idx) => (
-                                                    <li key={idx}>{cat}</li>
+                                                    <li key={idx} style={{marginBottom:'5px', fontSize:'14px'}}>{cat}</li>
                                                 ))}
                                             </ul>
                                         </div>
                                     )}
+
+                                    <ClassifImage classificacao={resultados.classificacao} />
                                 </div>
 
                                 <div className="result-card">
-                                    <div className="result-title">
-                                        <span>📋 Orientações e Documentação</span>
-                                    </div>
+                                    <div className="result-title">📋 Orientações e Documentação</div>
                                     <div className="result-content">{resultados.orientacoes}</div>
                                 </div>
 
                                 <div className="result-card">
-                                    <div className="result-title">
-                                        <span>💡 Critérios de Universalização</span>
-                                    </div>
+                                    <div className="result-title">💡 Critérios de Universalização</div>
                                     <div className="result-content">{resultados.universalizacao}</div>
                                 </div>
+
+                                <div style={{textAlign:'center', marginTop:'10px'}}>
+                                    <button className="btn btn-next" onClick={() => {
+                                        setDados({
+                                            zona:'', infraConsolidada:false, areaInferior2ha:false,
+                                            indiciosUrbanizacao:false, expansaoNaturalMunic:false,
+                                            redeAPorta:false, ramalSubt:false, cargaMenor50:false,
+                                            cargaAcima75:false, primeiroAtend:false, necessarioExtensao:false,
+                                            necessarioConversao:false, tensaoBaixa:false, atendIndividual:false,
+                                            semAlterExclusiva:false, registroApresentado:false, indigena:false,
+                                            quilombola:false, regularidadeUrbana:false, heranca:false,
+                                            ccirIndividualizado:false,
+                                        });
+                                        setStep(1);
+                                        window.scrollTo({top:0, behavior:'smooth'});
+                                    }}>
+                                        🔄 Nova Classificação
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* BOTÕES DE NAVEGAÇÃO */}
+                        {step < 5 && (
+                            <div className="nav-buttons">
+                                {step > 1 && (
+                                    <button className="btn btn-back" onClick={goBack}>← Voltar</button>
+                                )}
+                                <button
+                                    className="btn btn-next"
+                                    onClick={goNext}
+                                    disabled={!canNext()}
+                                >
+                                    {step === 4 ? 'Ver Resultado →' : 'Próximo →'}
+                                </button>
+                            </div>
+                        )}
+                        {step === 5 && (
+                            <div className="nav-buttons">
+                                <button className="btn btn-back" onClick={goBack}>← Voltar</button>
                             </div>
                         )}
                     </div>
