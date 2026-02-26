@@ -173,7 +173,7 @@
 
         .grid-2 {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(500px, 2fr));
             gap: 12px;
         }
 
@@ -293,7 +293,7 @@
 
         .classif-image-wrap img {
             width: 100%;
-            max-height: 280px;
+            max-height: 440px;
             object-fit: cover;
             display: block;
         }
@@ -320,6 +320,16 @@
             padding: 15px;
             background: #fff5f5;
             border: 1px solid #feb2b2;
+            border-radius: 8px;
+            color: #000000;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .explain {
+            padding: 15px;
+            background: #f5fff8;
+            border: 1px solid #b2fed8;
             border-radius: 8px;
             color: #000000;
             font-size: 14px;
@@ -363,8 +373,8 @@
         const STEPS = [
             { id: 1, label: 'Zona' },
             { id: 2, label: 'Características\ndo Local' },
-            { id: 3, label: 'Rede e\nCargas' },
-            { id: 4, label: 'Documentação' },
+            { id: 3, label: 'Rede de\nEnergia' },
+            { id: 4, label: 'Documentação e\nClassificação' },
             { id: 5, label: 'Resultado' },
         ];
 
@@ -445,10 +455,9 @@
 
             const [dados, setDados] = useState({
                 zona: '',
-                infraConsolidada: false,
+                empreendimento: false,
                 areaInferior2ha: false,
                 indiciosUrbanizacao: false,
-                expansaoNaturalMunic: false,
                 redeAPorta: false,
                 ramalSubt: false,
                 cargaMenor50: false,
@@ -492,7 +501,7 @@
                 if (dados.zona !== 'Área Rural') {
                     categorias.push('Atendimento como Imóvel Urbano');
                     hasUrban = true;
-                    orientacoes += `• Enquadramento urbano:\nO pedido não se caracteriza como rural e será tratado como imóvel urbano.\nDocumentação esperada:\n- Documento de posse ou propriedade;\n- Comprovação de regularidade urbana (IPTU).\n\n`;
+                    orientacoes += `• Enquadramento urbano:\nDocumentação esperada:\n- Documento de posse ou propriedade;\n- Comprovação de regularidade urbana (IPTU).\n\n`;
                     orientacoes += `• Regularização Fundiária (REURB):\nO atendimento poderá ser enquadrado em REURB, com custos atribuídos aos beneficiários.\n\n`;
                 } else {
                     if (dados.heranca) {
@@ -507,15 +516,16 @@
                         categorias.push('Pedido envolvendo Área Quilombola');
                         hasRural = true;
                         orientacoes += `• Pedido envolvendo Área Quilombola:\nAtendimento em área quilombola requer procedimentos específicos e documentação da comunidade.\n\n`;
-                    } else if (dados.indiciosUrbanizacao) {
-                        if (dados.infraConsolidada && dados.expansaoNaturalMunic) {
-                            categorias.push('Necessária Regularização Fundiária (REURB)');
+                    } else if (dados.empreendimento) {
+
+                        if (dados.indiciosUrbanizacao && dados.redeAPorta) {
+                            categorias.push('Empreendimento já atendido');
                             hasUrban = true;
-                            orientacoes += `• Área rural com indícios de urbanização e infraestrutura consolidada:\nO atendimento requer Regularização Fundiária Urbana (REURB).\nREURB-E: custeada pelos beneficiários;\nREURB-S: custeada pelo município, conforme Lei nº 13.465/2017 e REN 1000/2021.\n\n`;
+                            orientacoes += `• Justificativa legal e regulatória:\n=>Parcelas não concluídas do empreendimento (ART.484 REN1000/2021)\n=>Expansão de núcleo urbano consolidado: \n       REURB-E: custeada pelos beneficiários;\n     REURB-S: custeada pelo município, conforme Lei nº 13.465/2017 e REN 1000/2021.\n\n`;
                         } else {
-                            categorias.push('Parcelamento de Solo');
-                            hasRural = true;
-                            orientacoes += `• Área rural com indícios de urbanização sem infraestrutura consolidada:\nCaracteriza parcelamento de solo.\nA implantação ou custeio da infraestrutura básica das redes internas de energia elétrica é de responsabilidade do interessado, conforme REN 1000/2021 (arts. 480 a 484).\n\n`;
+                            categorias.push('Empreendimento não implantado');
+                            hasUrban = true;
+                            orientacoes += `• Justificativa legal e regulatória:\nParcelamento de solo, conforme Lei 6766/79.\nA implantação ou custeio da infraestrutura básica das redes internas de energia elétrica é de responsabilidade do interessado, conforme REN 1000/2021 (arts. 480 a 484).\n\n`;
                         }
                     } else {
                         if (dados.areaInferior2ha && (dados.registroApresentado || dados.ccirIndividualizado)) {
@@ -525,7 +535,7 @@
                         } else {
                             categorias.push('Imóvel rural abaixo da FMP');
                             hasRural = true;
-                            orientacoes += `• Área rural inferior à Fração Mínima de Parcelamento (FMP):\nÉ necessária a apresentação de Certificado de Cadastro de Imóvel Rural (CCIR) individualizado, referente à área solicitada.\n\n`;
+                            orientacoes += `• Justificativa legal e regulatória::\nÉ necessária a apresentação de Certificado de Cadastro de Imóvel Rural (CCIR) individualizado, referente à área solicitada.\n\n`;
                         }
                     }
                 }
@@ -540,7 +550,7 @@
                     docBase = `Documentação normalmente requerida para atendimento em área rural:\n- Documento de posse ou propriedade do imóvel (escritura, contrato de compra e venda, arrendamento ou equivalente);\n- Certificado de Cadastro de Imóvel Rural (CCIR) da área solicitada.\n\n`;
                 }
                 if (hasUrban) {
-                    docBase += `Documentação normalmente requerida para atendimento em área urbana:\n- Documento de posse ou propriedade do imóvel;\n- Documento municipal que comprove regularidade da edificação (IPTU, alvará, Habite-se, certidão de número ou equivalente).\n\n`;
+                    docBase += `Documentação normalmente requerida para atendimento em área urbana:\n- Documento de posse ou propriedade do imóvel; e \n- Documento municipal que comprove regularidade da edificação (IPTU, alvará, Habite-se, certidão de número ou equivalente); ou \n Projeto aprovado pela prefeitura.\n\n`;
                 }
                 orientacoes = docBase + orientacoes;
 
@@ -601,48 +611,56 @@
 
                         {/* ETAPA 1 — ZONA */}
                         {step === 1 && (
-                            <div className="section">
-                                <div className="section-title">
-                                    <div className="section-icon">📌</div>
-                                    Enquadramento da Localização do Imóvel
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label">Classificação da Zona de Localização do Imóvel:</label>
-                                    <div className="radio-group">
-                                        {['Área Rural', 'Área Urbana'].map(z => (
-                                            <label key={z} className={`radio-option ${dados.zona === z ? 'selected' : ''}`}>
-                                                <input
-                                                    type="radio"
-                                                    name="zona"
-                                                    value={z}
-                                                    checked={dados.zona === z}
-                                                    onChange={(e) => handleChange('zona', e.target.value)}
-                                                />
-                                                <span>{z === 'Área Rural' ? '🌿 Área Rural' : '🏙️ Área Urbana'}</span>
-                                            </label>
-                                        ))}
+                            <>
+                                <div className="section">
+                                    <div className="section-title">
+                                        <div className="section-icon">📌</div>
+                                        Enquadramento da Localização do Imóvel
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Classificação da Zona de Localização do Imóvel:</label>
+                                        <div className="radio-group">
+                                            {['Área Rural', 'Área Urbana'].map(z => (
+                                                <label key={z} className={`radio-option ${dados.zona === z ? 'selected' : ''}`}>
+                                                    <input
+                                                        type="radio"
+                                                        name="zona"
+                                                        value={z}
+                                                        checked={dados.zona === z}
+                                                        onChange={(e) => handleChange('zona', e.target.value)}
+                                                    />
+                                                    <span>{z === 'Área Rural' ? '🌿 Área Rural' : '🏙️ Área Urbana'}</span>
+                                                </label>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                                 {!dados.zona && (
                                     <div className="alert">⚠️ Selecione a zona territorial para aplicação dos critérios técnicos e regulatórios.</div>
                                 )}
-                            </div>
+                            </>
                         )}
 
                         {/* ETAPA 2 — CARACTERÍSTICAS DO LOCAL */}
                         {step === 2 && (
-                            <div className="section">
-                                <div className="section-title">
-                                    <div className="section-icon">🏡</div>
-                                    Características do Local ({dados.zona})
+                            <>
+                                <div className="section">
+                                    <div className="section-title">
+                                        <div className="section-icon">🏡</div>
+                                        Características do Local ({dados.zona})
+                                    </div>
+                                    <div className="grid-2">
+                                        <CheckboxField label="Faz parte de empreendimento" checked={dados.empreendimento} onChange={v => handleChange('empreendimento', v)} />
+                                        <CheckboxField label="Área do terreno/imóvel inferior a 2 ha" checked={dados.areaInferior2ha} onChange={v => handleChange('areaInferior2ha', v)} />
+                                        <CheckboxField label="Há indícios de urbanização (sem atividade rural)" checked={dados.indiciosUrbanizacao} onChange={v => handleChange('indiciosUrbanizacao', v)} />
+                                        <CheckboxField label="Localizado em área indígena" checked={dados.indigena} onChange={v => handleChange('indigena', v)} />
+                                        <CheckboxField label="Localizado em área quilombola" checked={dados.quilombola} onChange={v => handleChange('quilombola', v)} />
+                                    </div>
                                 </div>
-                                <div className="grid-2">
-                                    <CheckboxField label="Possui infraestrutura consolidada" checked={dados.infraConsolidada} onChange={v => handleChange('infraConsolidada', v)} />
-                                    <CheckboxField label="Área do terreno/imóvel inferior a 2 ha" checked={dados.areaInferior2ha} onChange={v => handleChange('areaInferior2ha', v)} />
-                                    <CheckboxField label="Há indícios de urbanização" checked={dados.indiciosUrbanizacao} onChange={v => handleChange('indiciosUrbanizacao', v)} />
-                                    <CheckboxField label="Área de expansão natural do município" checked={dados.expansaoNaturalMunic} onChange={v => handleChange('expansaoNaturalMunic', v)} />
-                                </div>
-                            </div>
+                                {!dados.empreendimento && (
+                                    <div className="explain">ℹ️ Caracteriza-se como empreendimento: múltiplas divisões do terreno (lotes ou glebas), abertura de vias, residências e infraestrutura compartilhada.</div>
+                                )}
+                            </>
                         )}
 
                         {/* ETAPA 3 — REDE LOCAL E CARGAS */}
@@ -650,37 +668,44 @@
                             <div className="section">
                                 <div className="section-title">
                                     <div className="section-icon">⚡</div>
-                                    Rede Local e Cargas
+                                    Rede Local
                                 </div>
                                 <div className="grid-2">
-                                    <CheckboxField label="Possui rede de baixa tensão à porta" checked={dados.redeAPorta} onChange={v => handleChange('redeAPorta', v)} />
-                                    <CheckboxField label="Ramal subterrâneo" checked={dados.ramalSubt} onChange={v => handleChange('ramalSubt', v)} />
-                                    <CheckboxField label="Carga instalada inferior a 50 kW" checked={dados.cargaMenor50} onChange={v => handleChange('cargaMenor50', v)} />
-                                    <CheckboxField label="Carga instalada acima de 75 kW" checked={dados.cargaAcima75} onChange={v => handleChange('cargaAcima75', v)} />
-                                    <CheckboxField label="Primeiro atendimento" checked={dados.primeiroAtend} onChange={v => handleChange('primeiroAtend', v)} />
+                                    <CheckboxField label="Possui rede de baixa ou média próxima" checked={dados.redeAPorta} onChange={v => handleChange('redeAPorta', v)} />
                                     <CheckboxField label="Necessário extensão de rede" checked={dados.necessarioExtensao} onChange={v => handleChange('necessarioExtensao', v)} />
-                                    <CheckboxField label="Necessário conversão de rede" checked={dados.necessarioConversao} onChange={v => handleChange('necessarioConversao', v)} />
-                                    <CheckboxField label="Atendimento em baixa tensão" checked={dados.tensaoBaixa} onChange={v => handleChange('tensaoBaixa', v)} />
-                                    <CheckboxField label="Atendimento individual" checked={dados.atendIndividual} onChange={v => handleChange('atendIndividual', v)} />
-                                    <CheckboxField label="Sem alteração na rede por motivo exclusivo" checked={dados.semAlterExclusiva} onChange={v => handleChange('semAlterExclusiva', v)} />
                                 </div>
                             </div>
                         )}
 
                         {/* ETAPA 4 — DOCUMENTAÇÃO */}
                         {step === 4 && (
-                            <div className="section">
-                                <div className="section-title">
-                                    <div className="section-icon">📄</div>
-                                    Documentação
+                            <div>
+                                <div className="section">
+                                    <div className="section-title">
+                                        <div className="section-icon">📄</div>
+                                        Documentação e Classificação
+                                    </div>
+                                    <div className="grid-2">
+                                        <CheckboxField label="Registro do imóvel apresentado" checked={dados.registroApresentado} onChange={v => handleChange('registroApresentado', v)} />
+                                        <CheckboxField label="Regularidade urbana apresentada" checked={dados.regularidadeUrbana} onChange={v => handleChange('regularidadeUrbana', v)} />
+                                        <CheckboxField label="Pedido envolvendo Inventário ou herança" checked={dados.heranca} onChange={v => handleChange('heranca', v)} />
+                                        <CheckboxField label="CCIR individualizado" checked={dados.ccirIndividualizado} onChange={v => handleChange('ccirIndividualizado', v)} />
+                                    </div>
                                 </div>
-                                <div className="grid-2">
-                                    <CheckboxField label="Registro apresentado" checked={dados.registroApresentado} onChange={v => handleChange('registroApresentado', v)} />
-                                    <CheckboxField label="Localizado em área indígena" checked={dados.indigena} onChange={v => handleChange('indigena', v)} />
-                                    <CheckboxField label="Localizado em área quilombola" checked={dados.quilombola} onChange={v => handleChange('quilombola', v)} />
-                                    <CheckboxField label="Regularidade urbana apresentada" checked={dados.regularidadeUrbana} onChange={v => handleChange('regularidadeUrbana', v)} />
-                                    <CheckboxField label="Inventário ou herança" checked={dados.heranca} onChange={v => handleChange('heranca', v)} />
-                                    <CheckboxField label="CCIR individualizado" checked={dados.ccirIndividualizado} onChange={v => handleChange('ccirIndividualizado', v)} />
+                                
+                                <div className="section">
+                                    <div className="section-title">
+                                        <div className="section-icon">📄</div>
+                                        Classificação
+                                    </div>
+                                    <div className="grid-2">
+                                        <CheckboxField label="Carga instalada inferior a 50 kW" checked={dados.cargaMenor50} onChange={v => handleChange('cargaMenor50', v)} />
+                                        <CheckboxField label="Carga instalada acima de 75 kW" checked={dados.cargaAcima75} onChange={v => handleChange('cargaAcima75', v)} />
+                                        <CheckboxField label="Primeiro atendimento" checked={dados.primeiroAtend} onChange={v => handleChange('primeiroAtend', v)} />
+                                        <CheckboxField label="Atendimento em baixa tensão" checked={dados.tensaoBaixa} onChange={v => handleChange('tensaoBaixa', v)} />
+                                        <CheckboxField label="Atendimento individual" checked={dados.atendIndividual} onChange={v => handleChange('atendIndividual', v)} />
+                                        <CheckboxField label="Sem alteração na rede por motivo exclusivo" checked={dados.semAlterExclusiva} onChange={v => handleChange('semAlterExclusiva', v)} />
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -720,8 +745,7 @@
                                 <div style={{textAlign:'center', marginTop:'10px'}}>
                                     <button className="btn btn-next" onClick={() => {
                                         setDados({
-                                            zona:'', infraConsolidada:false, areaInferior2ha:false,
-                                            indiciosUrbanizacao:false, expansaoNaturalMunic:false,
+                                            zona:'', empreendimento:false, areaInferior2ha:false,
                                             redeAPorta:false, ramalSubt:false, cargaMenor50:false,
                                             cargaAcima75:false, primeiroAtend:false, necessarioExtensao:false,
                                             necessarioConversao:false, tensaoBaixa:false, atendIndividual:false,
