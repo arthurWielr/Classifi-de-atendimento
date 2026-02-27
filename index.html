@@ -261,7 +261,8 @@
       .nav-buttons {
         display: flex;
         justify-content: space-between;
-        margin-top: 24px;
+        margin-top: 12px;
+        margin-bottom: 12px;
         gap: 12px;
       }
 
@@ -625,6 +626,7 @@
           let hasHerança = false;
           let hasFMP = false;
           let hasAmbiental = false;
+          let hasParcelamento = false;
 
           if (
             dados.zona !== "Área Rural" &&
@@ -662,7 +664,7 @@
               hasQuilombola = true;
               orientacoes += `• Pedido envolvendo Área Quilombola:\nAtendimento em área quilombola requer procedimentos específicos e autorização do INCRA ou Instituto Palmares.\n\n`;
             } else if (dados.empreendimento) {
-              if (dados.indiciosUrbanizacao && dados.redeAPorta) {
+              if (dados.indiciosUrbanizacao || dados.redeAPorta) {
                 categorias.push("Empreendimento já atendido");
                 hasEmpreendimento = true;
                 orientacoes +=
@@ -677,10 +679,21 @@
                 orientacoes += `• Justificativa legal e regulatória:\nParcelamento de solo, conforme Lei 6766/79.\nA implantação ou custeio da infraestrutura básica das redes internas de energia elétrica é de responsabilidade do interessado, conforme REN 1000/2021 (arts. 480 a 484).\n\n`;
               }
             } else {
-              if (
-                dados.areaInferior2ha &&
-                (dados.registroApresentado || dados.ccirIndividualizado)
-              ) {
+              if (dados.indiciosUrbanizacao && dados.redeAPorta) {
+                categorias.push("Parcelamento de solo já consolidado");
+                hasParcelamento = true;
+                orientacoes +=
+                  " • Expansão de núcleo urbano consolidado:\n" +
+                  " - REURB-E: custeada pelos beneficiários;\n" +
+                  " - REURB-S: custeada pelo município, conforme Lei nº 13.465/2017 e REN nº 1000/2021.\n\n";
+              } else if (dados.indiciosUrbanizacao) {
+                categorias.push("Parcelamento de solo em processo de formação");
+                hasParcelamento = true;
+                orientacoes +=
+                  " • Expansão de núcleo urbano em processo de formação:\n" +
+                  " - REURB-E: custeada pelos beneficiários;\n" +
+                  " - REURB-S: custeada pelo município, conforme Lei nº 13.465/2017 e REN nº 1000/2021.\n\n";
+              } else if (dados.areaInferior2ha && (dados.registroApresentado || dados.ccirIndividualizado)) {
                 categorias.push("Atendimento como Imóvel Rural");
                 hasRural = true;
                 orientacoes += `• Área rural sem indícios de urbanização:\nO atendimento pode ser enquadrado como imóvel rural, mediante apresentação da documentação rural aplicável.\n\n`;
@@ -726,6 +739,14 @@
               "- Documento de posse ou propriedade do imóvel; e\n" +
               "- Documento municipal que comprove regularidade da edificação (IPTU, alvará, Habite-se, certidão de número ou equivalente); ou\n" +
               "- Projeto aprovado pela prefeitura.\n\n";
+          }
+          if (hasParcelamento) {
+            docBase +=
+              "Documentação exigida para atendimento em parcelamento de solo já consolidado ou em processo de formação:\n\n" +
+              "- Documento de posse ou propriedade do imóvel; e\n" +
+              "- Documento municipal que comprove regularidade da edificação (IPTU, alvará, Habite-se, certidão de número ou equivalente); ou\n" +
+              "- Projeto aprovado pela prefeitura; ou\n" +
+              "- Comprovação de regularização fundiária urbana emitida pela prefeitura (REURB).\n\n";
           }
           if (hasIndigena) {
             docBase +=
@@ -833,6 +854,30 @@
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
               />
+              {/* BOTÕES DE NAVEGAÇÃO */}
+              {step < 5 && (
+                <div className="nav-buttons">
+                  {step > 1 && (
+                    <button className="btn btn-back" onClick={goBack}>
+                      ← Voltar
+                    </button>
+                  )}
+                  <button
+                    className="btn btn-next"
+                    onClick={goNext}
+                    disabled={!canNext()}
+                  >
+                    {step === 4 ? "Ver Resultado →" : "Próximo →"}
+                  </button>
+                </div>
+              )}
+              {step === 5 && (
+                <div className="nav-buttons">
+                  <button className="btn btn-back" onClick={goBack}>
+                    ← Voltar
+                  </button>
+                </div>
+              )}
 
               {/* ETAPA 1 — ZONA */}
               {step === 1 && (
@@ -1119,31 +1164,6 @@
                       🔄 Nova Classificação
                     </button>
                   </div>
-                </div>
-              )}
-
-              {/* BOTÕES DE NAVEGAÇÃO */}
-              {step < 5 && (
-                <div className="nav-buttons">
-                  {step > 1 && (
-                    <button className="btn btn-back" onClick={goBack}>
-                      ← Voltar
-                    </button>
-                  )}
-                  <button
-                    className="btn btn-next"
-                    onClick={goNext}
-                    disabled={!canNext()}
-                  >
-                    {step === 4 ? "Ver Resultado →" : "Próximo →"}
-                  </button>
-                </div>
-              )}
-              {step === 5 && (
-                <div className="nav-buttons">
-                  <button className="btn btn-back" onClick={goBack}>
-                    ← Voltar
-                  </button>
                 </div>
               )}
             </div>
