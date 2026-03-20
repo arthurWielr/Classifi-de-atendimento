@@ -580,6 +580,7 @@
           areaInferior2ha: false,
           indiciosUrbanizacao: false,
           redeAPorta: false,
+          viasCirculacao: false,
           ramalSubt: false,
           cargaMenor50: false,
           cargaAcima75: false,
@@ -621,6 +622,8 @@
           let hasRural = false;
           let hasUrban = false;
           let hasEmpreendimento = false;
+          let hasCirculacao = false;
+          let hasRede = false;
           let hasIndigena = false;
           let hasQuilombola = false;
           let hasHerança = false;
@@ -635,6 +638,7 @@
           ) {
             categorias.push("Empreendimento já atendido");
             hasEmpreendimento = true;
+            hasRede = true;
             orientacoes +=
               "• Justificativa legal e regulatória:\n" +
               " - Parcelas não concluídas do empreendimento (Art. 484, REN nº 1000/2021)\n" +
@@ -642,6 +646,17 @@
               " - REURB-E: custeada pelos beneficiários;\n" +
               " - REURB-S: custeada pelo município, conforme Lei nº 13.465/2017 e REN nº 1000/2021.\n\n";
           } else if (dados.zona !== "Área Rural" && dados.empreendimento) {
+            categorias.push("Empreendimento não implantado");
+            hasEmpreendimento = true;
+            orientacoes += `• Justificativa legal e regulatória:\nA implantação ou custeio da infraestrutura básica das redes internas de energia elétrica é de responsabilidade do interessado, conforme REN 1000/2021 (arts. 480 a 484).\n\n`;
+          } else if (
+            dados.zona !== "Área Rural" &&
+            dados.empreendimento &&
+            !dados.redeAPorta &&
+            dados.viasCirculacao
+          ) {
+            hasEmpreendimento = true;
+            hasCirculacao = true;
             categorias.push("Empreendimento não implantado");
             hasEmpreendimento = true;
             orientacoes += `• Justificativa legal e regulatória:\nA implantação ou custeio da infraestrutura básica das redes internas de energia elétrica é de responsabilidade do interessado, conforme REN 1000/2021 (arts. 480 a 484).\n\n`;
@@ -664,10 +679,12 @@
               hasQuilombola = true;
               orientacoes += `• Pedido envolvendo Área Quilombola:\nAtendimento em área quilombola requer procedimentos específicos e autorização do INCRA ou Instituto Palmares.\n\n`;
             } else if (dados.empreendimento) {
-              if (dados.indiciosUrbanizacao || dados.redeAPorta) {
+              if (dados.redeAPorta) {
                 categorias.push("Empreendimento já atendido");
                 hasEmpreendimento = true;
+                hasRede = true;
                 orientacoes +=
+                  "• ATENÇÃO, TRATA-SE DE PEDIDO URBANO, ENTRAR COM SOLICITAÇÃO URBANA.\n" +
                   "• Justificativa legal e regulatória:\n" +
                   " - Parcelas não concluídas do empreendimento (Art. 484, REN nº 1000/2021)\n" +
                   " • Expansão de núcleo urbano consolidado:\n" +
@@ -676,24 +693,43 @@
               } else {
                 categorias.push("Empreendimento não implantado");
                 hasEmpreendimento = true;
-                orientacoes += `• Justificativa legal e regulatória:\nParcelamento de solo, conforme Lei 6766/79.\nA implantação ou custeio da infraestrutura básica das redes internas de energia elétrica é de responsabilidade do interessado, conforme REN 1000/2021 (arts. 480 a 484).\n\n`;
+                orientacoes +=
+                  "• ATENÇÃO, TRATA-SE DE PEDIDO URBANO, ENTRAR COM SOLICITAÇÃO URBANA.\n" +
+                  "• Justificativa legal e regulatória:\n" +
+                  "Parcelamento de solo, conforme Lei 6766/79.\n" +
+                  "A implantação ou custeio da infraestrutura básica das redes internas de energia elétrica é de responsabilidade do interessado, conforme REN 1000/2021 (arts. 480 a 484).\n\n";
               }
             } else {
               if (dados.indiciosUrbanizacao && dados.redeAPorta) {
                 categorias.push("Parcelamento de solo já consolidado");
                 hasParcelamento = true;
+                hasRede = true;
                 orientacoes +=
+                  "• ATENÇÃO, TRATA-SE DE PEDIDO URBANO, ENTRAR COM SOLICITAÇÃO URBANA.\n" +
                   " • Expansão de núcleo urbano consolidado:\n" +
+                  " - REURB-E: custeada pelos beneficiários;\n" +
+                  " - REURB-S: custeada pelo município, conforme Lei nº 13.465/2017 e REN nº 1000/2021.\n\n";
+              } else if (dados.indiciosUrbanizacao && dados.viasCirculacao) {
+                categorias.push("Parcelamento de solo em processo de formação");
+                hasParcelamento = true;
+                hasCirculacao = true;
+                orientacoes +=
+                  "• ATENÇÃO, TRATA-SE DE PEDIDO URBANO, ENTRAR COM SOLICITAÇÃO URBANA.\n" +
+                  " • Expansão de núcleo urbano em processo de formação:\n" +
                   " - REURB-E: custeada pelos beneficiários;\n" +
                   " - REURB-S: custeada pelo município, conforme Lei nº 13.465/2017 e REN nº 1000/2021.\n\n";
               } else if (dados.indiciosUrbanizacao) {
                 categorias.push("Parcelamento de solo em processo de formação");
                 hasParcelamento = true;
                 orientacoes +=
+                  "• ATENÇÃO, TRATA-SE DE PEDIDO URBANO, ENTRAR COM SOLICITAÇÃO URBANA.\n" +
                   " • Expansão de núcleo urbano em processo de formação:\n" +
                   " - REURB-E: custeada pelos beneficiários;\n" +
                   " - REURB-S: custeada pelo município, conforme Lei nº 13.465/2017 e REN nº 1000/2021.\n\n";
-              } else if (dados.areaInferior2ha && (dados.registroApresentado || dados.ccirIndividualizado)) {
+              } else if (
+                dados.areaInferior2ha &&
+                (dados.registroApresentado || dados.ccirIndividualizado)
+              ) {
                 categorias.push("Atendimento como Imóvel Rural");
                 hasRural = true;
                 orientacoes += `• Área rural sem indícios de urbanização:\nO atendimento pode ser enquadrado como imóvel rural, mediante apresentação da documentação rural aplicável.\n\n`;
@@ -733,20 +769,28 @@
           if (hasUrban) {
             docBase += `Documentação necessária para atendimento em área urbana:\n- Documento de posse ou propriedade do imóvel; e \n- Documento municipal que comprove regularidade da edificação (IPTU, alvará, Habite-se, certidão de número ou equivalente).\n\n`;
           }
-          if (hasEmpreendimento) {
+          if (hasEmpreendimento && !hasRede) {
             docBase +=
               "Documentação exigida para atendimento em empreendimentos já consolidados ou em implantação:\n\n" +
               "- Documento de posse ou propriedade do imóvel; e\n" +
-              "- Documento municipal que comprove regularidade da edificação (IPTU, alvará, Habite-se, certidão de número ou equivalente); ou\n" +
-              "- Projeto aprovado pela prefeitura.\n\n";
+              "- Projeto aprovado pela prefeitura; e\n" +
+              "- Documento municipal que comprove regularidade da edificação (IPTU, alvará, Habite-se, certidão de número ou equivalente). \n\n";
           }
-          if (hasParcelamento) {
+          if (hasEmpreendimento && (hasRede || hasCirculacao)) {
+            docBase +=
+              "Documentação exigida para atendimento em empreendimentos já consolidados ou em implantação:\n\n" +
+              "- Documento de posse ou propriedade do imóvel; e\n" +
+              "- Documento municipal que comprove regularidade da edificação (IPTU, alvará, Habite-se, certidão de número ou equivalente). \n\n";
+          }
+          if (hasParcelamento && hasRede) {
             docBase +=
               "Documentação exigida para atendimento em parcelamento de solo já consolidado ou em processo de formação:\n\n" +
               "- Documento de posse ou propriedade do imóvel; e\n" +
               "- Documento municipal que comprove regularidade da edificação (IPTU, alvará, Habite-se, certidão de número ou equivalente); ou\n" +
-              "- Projeto aprovado pela prefeitura; ou\n" +
               "- Comprovação de regularização fundiária urbana emitida pela prefeitura (REURB).\n\n";
+          }
+          if (hasParcelamento && !hasRede && hasCirculacao) {
+            docBase += "";
           }
           if (hasIndigena) {
             docBase +=
@@ -783,7 +827,7 @@
           orientacoes = docBase + orientacoes;
 
           let universalizacao = "";
-          if (dados.zona !== "Rural") {
+          if (dados.zona === "Área Rural") {
             const isUniversalizavel =
               dados.tensaoBaixa &&
               dados.atendIndividual &&
@@ -793,11 +837,29 @@
               !dados.necessarioExtensao &&
               !dados.necessarioConversao;
 
+            universalizacao = `O atendimento poderá ser gratuito desde que atendidos todos os seguintes critérios:
+                              \n• Atendimento em baixa tensão;
+                              \n• Atendimento individual;
+                              \n• Carga instalada inferior a 50 kW;
+                              \n• Primeiro atendimento do imóvel;
+                              \n• Ausência de necessidade de alteração exclusiva para o solicitante;
+                              \n• Ausência de necessidade de extensão ou conversão de rede;
+                              \n• Ausência de necessidade de ramal subterrâneo.`;
+          }
+
+          if (dados.zona === "Área Urbana") {
+            const isUniversalizavel = dados.redeAPorta;
+
             universalizacao = isUniversalizavel
-              ? `A solicitação atende integralmente aos critérios de universalização de obra em área urbana, considerando:\n• Atendimento em baixa tensão;\n• Atendimento individual;\n• Carga instalada inferior a 50 kW;\n• Primeiro atendimento do imóvel;\n• Ausência de necessidade de alteração exclusiva para o solicitante;\n• Ausência de necessidade de extensão ou conversão de rede;\n• Ausência de necessidade de ramal subterrâneo.`
-              : `A solicitação não atende integralmente aos critérios de universalização de obra em área urbana. O enquadramento depende da avaliação individual dos requisitos técnicos informados no checklist.`;
-          } else {
-            universalizacao = `Critérios de universalização de obra aplicáveis exclusivamente a atendimentos em área urbana.`;
+              ? `O atendimento poderá ser gratuito desde que atendidos todos os seguintes critérios:
+                \n• Atendimento em baixa tensão;
+                \n• Atendimento individual;
+                \n• Carga instalada inferior a 50 kW;
+                \n• Primeiro atendimento do imóvel;
+                \n• Ausência de necessidade de alteração exclusiva para o solicitante;
+                \n• Ausência de necessidade de extensão ou conversão de rede;
+                \n• Ausência de necessidade de ramal subterrâneo.`
+              : `O atendimento não se enquadra nos critérios de gratuidade`;
           }
 
           setResultados({
@@ -991,9 +1053,16 @@
                   </div>
                   <div className="grid-2">
                     <CheckboxField
-                      label="Possui rede de baixa ou média tensão próxima"
+                      label="Possui rede de baixa tensão à porta?"
                       checked={dados.redeAPorta}
                       onChange={(v) => handleChange("redeAPorta", v)}
+                    />
+                  </div>
+                  <div div style={{ marginTop: "14px" }} className="grid-2">
+                    <CheckboxField
+                      label="Possui vias de circulação de pedestre demarcadas?"
+                      checked={dados.viasCirculacao}
+                      onChange={(v) => handleChange("viasCirculacao", v)}
                     />
                   </div>
                 </div>
@@ -1139,6 +1208,7 @@
                           empreendimento: false,
                           areaInferior2ha: false,
                           redeAPorta: false,
+                          viasCirculacao: false,
                           ramalSubt: false,
                           cargaMenor50: false,
                           cargaAcima75: false,
